@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}HR Accounts{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-person-badge me-2"></i>HR Accounts</h1>
+  <a href="{{ url_for('admin_create_hr') }}" class="btn btn-primary btn-sm">
+    <i class="bi bi-plus-circle me-1"></i>Create HR Account
+  </a>
+</div>
+
+<div class="card-form">
+  {% if hr_users %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr><th>Username</th><th>Email</th><th>Status</th><th>Created</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        {% for hr in hr_users %}
+        <tr>
+          <td class="fw-semibold">{{ hr.username }}</td>
+          <td class="small">{{ hr.email }}</td>
+          <td>
+            {% if hr.is_approved %}
+            <span class="badge bg-success">Active</span>
+            {% else %}
+            <span class="badge bg-warning text-dark">Pending</span>
+            {% endif %}
+          </td>
+          <td class="small text-muted">{{ hr.created_at.strftime('%d %b %Y') }}</td>
+          <td>
+            <form method="POST" action="{{ url_for('admin_toggle_hr', user_id=hr.user_id) }}" class="d-inline">
+              {% if hr.is_approved %}
+              <button type="submit" class="btn btn-sm btn-outline-warning"
+                onclick="return confirm('Disable this HR account?')">
+                <i class="bi bi-pause-circle me-1"></i>Disable
+              </button>
+              {% else %}
+              <button type="submit" class="btn btn-sm btn-outline-success"
+                onclick="return confirm('Enable this HR account?')">
+                <i class="bi bi-check-circle me-1"></i>Enable
+              </button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-person-badge fs-1 d-block mb-2"></i>
+    No HR accounts yet. <a href="{{ url_for('admin_create_hr') }}">Create one</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}{{ employee.first_name }} {{ employee.last_name }} — Admin View{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-person-circle me-2"></i>{{ employee.first_name }} {{ employee.last_name }}</h1>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('admin_employees') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+    <form method="POST" action="{{ url_for('admin_toggle_employee_status', employee_id=employee.employee_id) }}"
+      onsubmit="return confirm('Change this employee status?')">
+      {% if employee.employee_status == 'ACTIVE' %}
+      <button type="submit" class="btn btn-sm btn-warning"><i class="bi bi-pause-circle me-1"></i>Deactivate</button>
+      {% else %}
+      <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-play-circle me-1"></i>Activate</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Header card -->
+  <div class="col-12">
+    <div class="card-form d-flex gap-4 align-items-center flex-wrap">
+      {% if employee.photo_path %}
+      <img src="/uploads/{{ employee.photo_path }}" class="rounded-circle" style="width:80px;height:80px;object-fit:cover;" />
+      {% else %}
+      <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold"
+        style="width:80px;height:80px;font-size:1.8rem;">
+        {{ employee.first_name[0] if employee.first_name else '?' }}
+      </div>
+      {% endif %}
+      <div>
+        <h4 class="fw-bold mb-0">{{ employee.first_name }} {{ employee.middle_name or '' }} {{ employee.last_name }}</h4>
+        <p class="text-muted mb-1">{{ employee.designation or '—' }} · {{ employee.department or '—' }}</p>
+        <span class="badge bg-primary me-1">{{ employee.employee_code }}</span>
+        <span class="badge {{ 'bg-success' if employee.employee_status == 'ACTIVE' else 'bg-secondary' }}">{{ employee.employee_status }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card-form">
+      <h5 class="section-title">Personal Details</h5>
+      <div class="row g-2">
+        {% macro rv(l,v) %}<div class="col-6"><div class="text-muted small">{{l}}</div><div class="fw-semibold small">{{v or '—'}}</div></div>{% endmacro %}
+        {{ rv("Date of Birth", employee.date_of_birth) }}
+        {{ rv("Gender", employee.gender) }}
+        {{ rv("Blood Group", employee.blood_group) }}
+        {{ rv("Nationality", employee.nationality) }}
+        {{ rv("Marital Status", employee.marital_status) }}
+        {{ rv("Mobile", employee.mobile_number) }}
+        {{ rv("Personal Email", employee.personal_email) }}
+        {{ rv("Joining Date", employee.joining_date) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card-form">
+      <h5 class="section-title">Bank & PF</h5>
+      <div class="row g-2">
+        {% macro rv(l,v) %}<div class="col-6"><div class="text-muted small">{{l}}</div><div class="fw-semibold small">{{v or '—'}}</div></div>{% endmacro %}
+        {{ rv("Bank", employee.bank_name) }}
+        {{ rv("Account No.", employee.account_number) }}
+        {{ rv("IFSC", employee.ifsc_code) }}
+        {{ rv("PF No.", employee.pf_number) }}
+        {{ rv("UAN", employee.uan_number) }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Payslips -->
+  <div class="col-12">
+    <div class="card-form">
+      <h5 class="section-title"><i class="bi bi-file-earmark-text me-2"></i>Payslips</h5>
+      {% set month_names = ["","January","February","March","April","May","June","July","August","September","October","November","December"] %}
+      {% if payslips %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>Period</th><th>Uploaded At</th></tr></thead>
+          <tbody>
+            {% for ps in payslips %}
+            <tr>
+              <td class="fw-semibold">{{ month_names[ps.month] }} {{ ps.year }}</td>
+              <td class="small text-muted">{{ ps.uploaded_at.strftime('%d %b %Y, %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted small">No payslips uploaded.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Audit Logs -->
+  <div class="col-12">
+    <div class="card-form">
+      <h5 class="section-title"><i class="bi bi-journal-text me-2"></i>Activity Log</h5>
+      {% if logs %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>Action</th><th>Performed By</th><th>Time</th><th>Details</th></tr></thead>
+          <tbody>
+            {% for log in logs %}
+            <tr>
+              <td><span class="badge bg-light text-dark border">{{ log.action }}</span></td>
+              <td class="small">{{ log.user.username if log.user else '—' }}</td>
+              <td class="small text-muted">{{ log.created_at.strftime('%d %b %Y, %H:%M') }}</td>
+              <td class="small text-muted">{{ log.details or '—' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted small">No activity recorded.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

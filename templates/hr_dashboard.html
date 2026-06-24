@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}HR Dashboard{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-speedometer2 me-2"></i>HR Dashboard</h1>
+  <div class="user-badge">
+    <i class="bi bi-person-badge"></i> {{ current_user.username }}
+    <span class="role-badge role-HR">HR</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="icon-wrap bg-warning bg-opacity-10"><i class="bi bi-hourglass-split text-warning"></i></div>
+      <div>
+        <div class="stat-value">{{ pending | length }}</div>
+        <div class="stat-label">Pending Review</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="icon-wrap bg-success bg-opacity-10"><i class="bi bi-check-circle text-success"></i></div>
+      <div>
+        <div class="stat-value">{{ approved | length }}</div>
+        <div class="stat-label">Approved Profiles</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="icon-wrap bg-danger bg-opacity-10"><i class="bi bi-x-circle text-danger"></i></div>
+      <div>
+        <div class="stat-value">{{ rejected | length }}</div>
+        <div class="stat-label">Rejected Profiles</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Profiles -->
+{% if pending %}
+<div class="card-form mb-4">
+  <h5 class="section-title"><i class="bi bi-clock me-2"></i>Pending Profile Reviews</h5>
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Email</th>
+          <th>Submitted</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pending %}
+        <tr>
+          <td>
+            <div class="fw-semibold">{{ p.first_name or '—' }} {{ p.last_name or '' }}</div>
+            <div class="text-muted small">{{ p.designation or 'No designation' }}</div>
+          </td>
+          <td class="small">{{ p.user.email }}</td>
+          <td class="small">{{ p.submitted_at.strftime('%d %b %Y, %H:%M') if p.submitted_at else '—' }}</td>
+          <td>
+            <a href="{{ url_for('hr_view_profile', profile_id=p.profile_id) }}" class="btn btn-sm btn-primary">
+              <i class="bi bi-eye me-1"></i>Review
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card-form mb-4 text-center py-4 text-muted">
+  <i class="bi bi-inbox fs-1 d-block mb-2"></i>No profiles pending review.
+</div>
+{% endif %}
+
+<!-- Approved -->
+{% if approved %}
+<div class="card-form">
+  <h5 class="section-title"><i class="bi bi-people me-2"></i>Approved Employees</h5>
+  <div class="table-responsive">
+    <table class="table table-sm align-middle">
+      <thead>
+        <tr><th>Name</th><th>Designation</th><th>Department</th><th>Approved On</th><th>Payslip</th></tr>
+      </thead>
+      <tbody>
+        {% for p in approved %}
+        <tr>
+          <td class="fw-semibold">{{ p.first_name }} {{ p.last_name }}</td>
+          <td class="small">{{ p.designation or '—' }}</td>
+          <td class="small">{{ p.department or '—' }}</td>
+          <td class="small">{{ p.reviewed_at.strftime('%d %b %Y') if p.reviewed_at else '—' }}</td>
+          <td>
+            {% if p.user.employee %}
+            <a href="{{ url_for('hr_upload_payslip', employee_id=p.user.employee.employee_id) }}" class="btn btn-sm btn-outline-secondary">
+              <i class="bi bi-upload me-1"></i>Payslip
+            </a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

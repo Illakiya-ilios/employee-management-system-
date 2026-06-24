@@ -1,0 +1,48 @@
+{% extends "profile/step_base.html" %}
+{% block step_content %}
+<h5 class="section-title"><i class="bi bi-bank me-2"></i>Bank & PF Details</h5>
+
+<form method="POST">
+  <h6 class="text-muted fw-semibold mb-3">Bank Account</h6>
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Bank Name</label>
+      <input type="text" name="bank_name" class="form-control" value="{{ profile.bank_name or '' }}" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Account Number</label>
+      <input type="text" name="account_number" class="form-control" value="{{ profile.account_number or '' }}" autocomplete="off" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Branch Name</label>
+      <input type="text" name="branch_name" class="form-control" value="{{ profile.branch_name or '' }}" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">IFSC Code</label>
+      <input type="text" name="ifsc_code" class="form-control text-uppercase" value="{{ profile.ifsc_code or '' }}" style="letter-spacing:.05em;" />
+    </div>
+  </div>
+
+  <hr />
+  <h6 class="text-muted fw-semibold mb-3 mt-3">Provident Fund Details</h6>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">PF Number</label>
+      <input type="text" name="pf_number" class="form-control" value="{{ profile.pf_number or '' }}" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">UAN Number</label>
+      <input type="text" name="uan_number" class="form-control" value="{{ profile.uan_number or '' }}" />
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between mt-4">
+    <button type="submit" name="action" value="prev" class="btn btn-outline-secondary px-4">
+      <i class="bi bi-chevron-left me-1"></i> Back
+    </button>
+    <button type="submit" name="action" value="next" class="btn btn-primary px-4">
+      Next <i class="bi bi-chevron-right ms-1"></i>
+    </button>
+  </div>
+</form>
+{% endblock %}

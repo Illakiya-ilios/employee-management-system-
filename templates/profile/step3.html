@@ -1,0 +1,96 @@
+{% extends "profile/step_base.html" %}
+{% block step_content %}
+<h5 class="section-title"><i class="bi bi-telephone-plus me-2"></i>Emergency Contacts</h5>
+
+{% set existing = profile.emergency_contacts_json | default('[]') | from_json %}
+
+<form method="POST">
+  <div id="ec-container">
+    {% if existing %}
+      {% for ec in existing %}
+      <div class="row g-3 mb-3 ec-row align-items-end">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Contact Name</label>
+          <input type="text" name="ec_name" class="form-control" value="{{ ec.name }}" required />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Relationship</label>
+          <input type="text" name="ec_relationship" class="form-control" value="{{ ec.relationship }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Phone Number</label>
+          <input type="tel" name="ec_phone" class="form-control" value="{{ ec.phone }}" />
+        </div>
+        <div class="col-md-1">
+          <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <!-- Default one row -->
+      <div class="row g-3 mb-3 ec-row align-items-end">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Contact Name <span class="text-danger">*</span></label>
+          <input type="text" name="ec_name" class="form-control" required />
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Relationship</label>
+          <input type="text" name="ec_relationship" class="form-control" placeholder="e.g. Spouse" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Phone Number</label>
+          <input type="tel" name="ec_phone" class="form-control" />
+        </div>
+        <div class="col-md-1">
+          <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <button type="button" class="btn btn-sm btn-outline-primary mt-1" onclick="addRow()">
+    <i class="bi bi-plus-circle me-1"></i> Add Another Contact
+  </button>
+
+  <div class="d-flex justify-content-between mt-4">
+    <button type="submit" name="action" value="prev" class="btn btn-outline-secondary px-4">
+      <i class="bi bi-chevron-left me-1"></i> Back
+    </button>
+    <button type="submit" name="action" value="next" class="btn btn-primary px-4">
+      Next <i class="bi bi-chevron-right ms-1"></i>
+    </button>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addRow() {
+  const container = document.getElementById('ec-container');
+  const row = document.createElement('div');
+  row.className = 'row g-3 mb-3 ec-row align-items-end';
+  row.innerHTML = `
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Contact Name</label>
+      <input type="text" name="ec_name" class="form-control" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-semibold">Relationship</label>
+      <input type="text" name="ec_relationship" class="form-control" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Phone Number</label>
+      <input type="tel" name="ec_phone" class="form-control" />
+    </div>
+    <div class="col-md-1">
+      <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeRow(this)"><i class="bi bi-trash"></i></button>
+    </div>
+  `;
+  container.appendChild(row);
+}
+function removeRow(btn) {
+  const rows = document.querySelectorAll('.ec-row');
+  if (rows.length > 1) btn.closest('.ec-row').remove();
+}
+</script>
+{% endblock %}

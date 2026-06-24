@@ -1,0 +1,102 @@
+{% extends "profile/step_base.html" %}
+{% block step_content %}
+<h5 class="section-title"><i class="bi bi-person me-2"></i>Personal Information</h5>
+
+<form method="POST" enctype="multipart/form-data">
+  <div class="row g-3">
+    <!-- Photo -->
+    <div class="col-12 text-center mb-2">
+      {% if profile.photo_path %}
+        <img src="/uploads/{{ profile.photo_path }}" class="rounded-circle mb-2" style="width:90px;height:90px;object-fit:cover;" />
+      {% else %}
+        <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mb-2" style="width:90px;height:90px;font-size:2rem;color:#94a3b8;"><i class="bi bi-person"></i></div>
+      {% endif %}
+      <div>
+        <label class="form-label fw-semibold d-block">Profile Photo</label>
+        <input type="file" name="photo" class="form-control form-control-sm" accept="image/*" style="max-width:260px;display:inline-block;" />
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">First Name <span class="text-danger">*</span></label>
+      <input type="text" name="first_name" class="form-control" value="{{ profile.first_name or '' }}" required />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Middle Name</label>
+      <input type="text" name="middle_name" class="form-control" value="{{ profile.middle_name or '' }}" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Last Name <span class="text-danger">*</span></label>
+      <input type="text" name="last_name" class="form-control" value="{{ profile.last_name or '' }}" required />
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Date of Birth</label>
+      <input type="date" name="date_of_birth" class="form-control" value="{{ profile.date_of_birth.strftime('%Y-%m-%d') if profile.date_of_birth else '' }}" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Gender</label>
+      <select name="gender" class="form-select">
+        <option value="">-- Select --</option>
+        {% for g in ["Male","Female","Other","Prefer not to say"] %}
+          <option value="{{ g }}" {{ 'selected' if profile.gender == g }}>{{ g }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Blood Group</label>
+      <select name="blood_group" class="form-select">
+        <option value="">-- Select --</option>
+        {% for bg in ["A+","A-","B+","B-","AB+","AB-","O+","O-"] %}
+          <option value="{{ bg }}" {{ 'selected' if profile.blood_group == bg }}>{{ bg }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Nationality</label>
+      <input type="text" name="nationality" class="form-control" value="{{ profile.nationality or '' }}" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Religion</label>
+      <input type="text" name="religion" class="form-control" value="{{ profile.religion or '' }}" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Place of Birth</label>
+      <input type="text" name="place_of_birth" class="form-control" value="{{ profile.place_of_birth or '' }}" />
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Mother Tongue</label>
+      <input type="text" name="mother_tongue" class="form-control" value="{{ profile.mother_tongue or '' }}" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Marital Status</label>
+      <select name="marital_status" class="form-select">
+        <option value="">-- Select --</option>
+        {% for ms in ["Single","Married","Divorced","Widowed"] %}
+          <option value="{{ ms }}" {{ 'selected' if profile.marital_status == ms }}>{{ ms }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Personal Email</label>
+      <input type="email" name="personal_email" class="form-control" value="{{ profile.personal_email or '' }}" />
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Mobile Number <span class="text-danger">*</span></label>
+      <input type="tel" name="mobile_number" class="form-control" value="{{ profile.mobile_number or '' }}" required />
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between mt-4">
+    <div></div>
+    <div class="d-flex gap-2">
+      <button type="submit" name="action" value="next" class="btn btn-primary px-4">
+        Next <i class="bi bi-chevron-right ms-1"></i>
+      </button>
+    </div>
+  </div>
+</form>
+{% endblock %}

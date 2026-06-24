@@ -1,0 +1,101 @@
+{% extends "profile/step_base.html" %}
+{% block step_content %}
+<h5 class="section-title"><i class="bi bi-briefcase me-2"></i>Employment Details</h5>
+
+{% set history = profile.employment_history_json | default('[]') | from_json %}
+
+<form method="POST">
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Designation / Job Title <span class="text-danger">*</span></label>
+      <input type="text" name="designation" class="form-control" value="{{ profile.designation or '' }}" required />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Department</label>
+      <input type="text" name="department" class="form-control" value="{{ profile.department or '' }}" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Date of Joining</label>
+      <input type="date" name="joining_date" class="form-control" value="{{ profile.joining_date.strftime('%Y-%m-%d') if profile.joining_date else '' }}" />
+    </div>
+  </div>
+
+  <h6 class="text-muted fw-semibold mb-3">Previous Employment History <span class="text-muted fw-normal">(optional)</span></h6>
+
+  <div id="emp-container">
+    {% if history %}
+      {% for h in history %}
+      <div class="row g-3 mb-3 emp-row align-items-end border rounded p-3 bg-light">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Employer Name</label>
+          <input type="text" name="employer_name" class="form-control" value="{{ h.employer }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Position Held</label>
+          <input type="text" name="position_held" class="form-control" value="{{ h.position }}" />
+        </div>
+        <div class="col-md-2">
+          <label class="form-label fw-semibold">From</label>
+          <input type="date" name="emp_from" class="form-control" value="{{ h.from }}" />
+        </div>
+        <div class="col-md-1">
+          <label class="form-label fw-semibold">To</label>
+          <input type="date" name="emp_to" class="form-control" value="{{ h.to }}" />
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeEmpRow(this)"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <button type="button" class="btn btn-sm btn-outline-primary mt-1" onclick="addEmpRow()">
+    <i class="bi bi-plus-circle me-1"></i> Add Employment Record
+  </button>
+
+  <div class="d-flex justify-content-between mt-4">
+    <button type="submit" name="action" value="prev" class="btn btn-outline-secondary px-4">
+      <i class="bi bi-chevron-left me-1"></i> Back
+    </button>
+    <button type="submit" name="action" value="next" class="btn btn-primary px-4">
+      Next <i class="bi bi-chevron-right ms-1"></i>
+    </button>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function addEmpRow() {
+  const c = document.getElementById('emp-container');
+  const row = document.createElement('div');
+  row.className = 'row g-3 mb-3 emp-row align-items-end border rounded p-3 bg-light';
+  row.innerHTML = `
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Employer Name</label>
+      <input type="text" name="employer_name" class="form-control" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Position Held</label>
+      <input type="text" name="position_held" class="form-control" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label fw-semibold">From</label>
+      <input type="date" name="emp_from" class="form-control" />
+    </div>
+    <div class="col-md-1">
+      <label class="form-label fw-semibold">To</label>
+      <input type="date" name="emp_to" class="form-control" />
+    </div>
+    <div class="col-md-1 d-flex align-items-end">
+      <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeEmpRow(this)"><i class="bi bi-trash"></i></button>
+    </div>
+  `;
+  c.appendChild(row);
+}
+function removeEmpRow(btn) {
+  btn.closest('.emp-row').remove();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Create HR Account{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-person-plus me-2"></i>Create HR Account</h1>
+  <a href="{{ url_for('admin_hr_list') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="card-form" style="max-width:520px;">
+  <h5 class="section-title">New HR Account</h5>
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Username <span class="text-danger">*</span></label>
+      <input type="text" name="username" class="form-control" required placeholder="hr_john" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+      <input type="email" name="email" class="form-control" required placeholder="hr@company.com" />
+    </div>
+    <div class="mb-4">
+      <label class="form-label fw-semibold">Temporary Password <span class="text-danger">*</span></label>
+      <input type="password" name="password" class="form-control" required minlength="6" />
+      <div class="form-text">The HR user should change this after first login.</div>
+    </div>
+    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+      <i class="bi bi-person-check me-2"></i>Create HR Account
+    </button>
+  </form>
+</div>
+{% endblock %}

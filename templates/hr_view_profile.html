@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}Review Profile — {{ profile.first_name }} {{ profile.last_name }}{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-person-check me-2"></i>Review Employee Profile</h1>
+  <a href="{{ url_for('hr_dashboard') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="row g-4">
+  <!-- Personal -->
+  <div class="col-12">
+    <div class="card-form">
+      <h5 class="section-title"><i class="bi bi-person me-2"></i>Personal Information</h5>
+      <div class="row g-2">
+        {% macro rv(label, val) %}
+          <div class="col-md-3 col-sm-6">
+            <div class="text-muted small">{{ label }}</div>
+            <div class="fw-semibold small">{{ val or '—' }}</div>
+          </div>
+        {% endmacro %}
+        {{ rv("Full Name", (profile.first_name or '') + ' ' + (profile.middle_name or '') + ' ' + (profile.last_name or '')) }}
+        {{ rv("Date of Birth", profile.date_of_birth) }}
+        {{ rv("Gender", profile.gender) }}
+        {{ rv("Blood Group", profile.blood_group) }}
+        {{ rv("Nationality", profile.nationality) }}
+        {{ rv("Religion", profile.religion) }}
+        {{ rv("Marital Status", profile.marital_status) }}
+        {{ rv("Mobile", profile.mobile_number) }}
+        {{ rv("Personal Email", profile.personal_email) }}
+        {{ rv("Mother Tongue", profile.mother_tongue) }}
+        {{ rv("Place of Birth", profile.place_of_birth) }}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card-form h-100">
+      <h5 class="section-title"><i class="bi bi-geo-alt me-2"></i>Address</h5>
+      <p class="small fw-semibold text-muted mb-1">Permanent</p>
+      <p class="small">{{ profile.perm_address_line1 or '—' }}, {{ profile.perm_city or '' }}, {{ profile.perm_state or '' }} {{ profile.perm_postal_code or '' }}, {{ profile.perm_country or '' }}</p>
+      <p class="small fw-semibold text-muted mb-1">Current</p>
+      <p class="small">{{ profile.curr_address_line1 or '—' }}, {{ profile.curr_city or '' }}, {{ profile.curr_state or '' }} {{ profile.curr_postal_code or '' }}, {{ profile.curr_country or '' }}</p>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card-form h-100">
+      <h5 class="section-title"><i class="bi bi-telephone me-2"></i>Emergency Contacts</h5>
+      {% for ec in emergency_contacts %}
+      <div class="d-flex gap-3 mb-2">
+        <i class="bi bi-person-heart text-primary mt-1"></i>
+        <div>
+          <div class="fw-semibold small">{{ ec.name }}</div>
+          <div class="text-muted small">{{ ec.relationship }} · {{ ec.phone }}</div>
+        </div>
+      </div>
+      {% else %}
+      <p class="text-muted small">None</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="card-form">
+      <h5 class="section-title"><i class="bi bi-briefcase me-2"></i>Employment</h5>
+      <div class="row g-2 mb-3">
+        <div class="col-md-3"><div class="text-muted small">Designation</div><div class="fw-semibold">{{ profile.designation or '—' }}</div></div>
+        <div class="col-md-3"><div class="text-muted small">Department</div><div class="fw-semibold">{{ profile.department or '—' }}</div></div>
+        <div class="col-md-3"><div class="text-muted small">Joining Date</div><div class="fw-semibold">{{ profile.joining_date or '—' }}</div></div>
+      </div>
+      {% if employment_history %}
+      <table class="table table-sm table-bordered small">
+        <thead class="table-light"><tr><th>Employer</th><th>Position</th><th>From</th><th>To</th></tr></thead>
+        <tbody>
+          {% for h in employment_history %}
+          <tr><td>{{ h.employer }}</td><td>{{ h.position }}</td><td>{{ h.from }}</td><td>{{ h.to }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card-form">
+      <h5 class="section-title"><i class="bi bi-bank me-2"></i>Bank & PF</h5>
+      <div class="row g-2">
+        <div class="col-6"><div class="text-muted small">Bank</div><div class="fw-semibold small">{{ profile.bank_name or '—' }}</div></div>
+        <div class="col-6"><div class="text-muted small">Account No.</div><div class="fw-semibold small">{{ profile.account_number or '—' }}</div></div>
+        <div class="col-6"><div class="text-muted small">IFSC</div><div class="fw-semibold small">{{ profile.ifsc_code or '—' }}</div></div>
+        <div class="col-6"><div class="text-muted small">PF No.</div><div class="fw-semibold small">{{ profile.pf_number or '—' }}</div></div>
+        <div class="col-6"><div class="text-muted small">UAN</div><div class="fw-semibold small">{{ profile.uan_number or '—' }}</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card-form">
+      <h5 class="section-title"><i class="bi bi-file-earmark-check me-2"></i>Documents</h5>
+      {% for doc in documents %}
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <i class="bi bi-file-earmark text-primary"></i>
+        <div>
+          <div class="fw-semibold small">{{ doc.type }}</div>
+          <div class="text-muted small">{{ doc.number or '—' }} · {{ '✓ File' if doc.file_path else '✗ No file' }}</div>
+        </div>
+      </div>
+      {% else %}
+      <p class="text-muted small">None</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Decision Panel -->
+  {% if profile.status == "PENDING" %}
+  <div class="col-12">
+    <div class="card-form border-warning" style="border:2px solid #fbbf24!important;">
+      <h5 class="section-title"><i class="bi bi-shield-check me-2"></i>HR Decision</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <form method="POST" action="{{ url_for('hr_approve_profile', profile_id=profile.profile_id) }}">
+            <label class="form-label fw-semibold">Approval Remarks <span class="text-muted fw-normal">(optional)</span></label>
+            <textarea name="remarks" class="form-control mb-3" rows="3" placeholder="Add any notes for the employee..."></textarea>
+            <button type="submit" class="btn btn-success w-100 py-2 fw-semibold"
+              onclick="return confirm('Approve this profile and create employee record?')">
+              <i class="bi bi-check-circle me-2"></i>Approve Profile
+            </button>
+          </form>
+        </div>
+        <div class="col-md-6">
+          <form method="POST" action="{{ url_for('hr_reject_profile', profile_id=profile.profile_id) }}">
+            <label class="form-label fw-semibold">Rejection Reason <span class="text-danger">*</span></label>
+            <textarea name="remarks" class="form-control mb-3" rows="3" placeholder="Explain why the profile is being rejected..." required></textarea>
+            <button type="submit" class="btn btn-danger w-100 py-2 fw-semibold"
+              onclick="return confirm('Reject this profile?')">
+              <i class="bi bi-x-circle me-2"></i>Reject Profile
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="col-12">
+    <div class="alert alert-{{ 'success' if profile.status == 'APPROVED' else 'danger' }}">
+      <strong>Status: {{ profile.status }}</strong>
+      {% if profile.hr_remarks %} — {{ profile.hr_remarks }}{% endif %}
+      {% if profile.reviewed_at %} ({{ profile.reviewed_at.strftime('%d %b %Y') }}){% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

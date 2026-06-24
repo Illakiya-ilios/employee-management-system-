@@ -1,0 +1,115 @@
+{% extends "profile/step_base.html" %}
+{% block step_content %}
+<h5 class="section-title"><i class="bi bi-file-earmark-check me-2"></i>Documents Upload</h5>
+
+{% set docs = profile.documents_json | default('[]') | from_json %}
+
+<p class="text-muted small mb-4">Upload identification and statutory documents. Accepted formats: PDF, JPG, PNG (max 16MB each).</p>
+
+<form method="POST" enctype="multipart/form-data">
+  <div id="doc-container">
+    {% set doc_types = ["Aadhar Card","PAN Card","Passport","Driving Licence","Voter ID","10th Certificate","12th Certificate","Degree Certificate","Experience Letter","Relieving Letter"] %}
+    {% if docs %}
+      {% for doc in docs %}
+      <div class="row g-3 mb-3 doc-row align-items-end border rounded p-3 bg-light">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Document Type</label>
+          <select name="doc_type" class="form-select">
+            <option value="">-- Select --</option>
+            {% for dt in doc_types %}
+              <option value="{{ dt }}" {{ 'selected' if doc.type == dt }}>{{ dt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Document Number</label>
+          <input type="text" name="doc_number" class="form-control" value="{{ doc.number or '' }}" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">
+            File
+            {% if doc.file_path %}<span class="text-success ms-1 small"><i class="bi bi-check-circle"></i> Uploaded</span>{% endif %}
+          </label>
+          <input type="file" name="doc_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeDocRow(this)"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="row g-3 mb-3 doc-row align-items-end border rounded p-3 bg-light">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Document Type</label>
+          <select name="doc_type" class="form-select">
+            <option value="">-- Select --</option>
+            {% for dt in ["Aadhar Card","PAN Card","Passport","Driving Licence","Voter ID","10th Certificate","12th Certificate","Degree Certificate","Experience Letter","Relieving Letter"] %}
+              <option value="{{ dt }}">{{ dt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label fw-semibold">Document Number</label>
+          <input type="text" name="doc_number" class="form-control" placeholder="e.g. XXXX-XXXX-XXXX" />
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">File</label>
+          <input type="file" name="doc_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+          <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeDocRow(this)"><i class="bi bi-trash"></i></button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <button type="button" class="btn btn-sm btn-outline-primary mt-1" onclick="addDocRow()">
+    <i class="bi bi-plus-circle me-1"></i> Add Another Document
+  </button>
+
+  <div class="d-flex justify-content-between mt-4">
+    <button type="submit" name="action" value="prev" class="btn btn-outline-secondary px-4">
+      <i class="bi bi-chevron-left me-1"></i> Back
+    </button>
+    <button type="submit" name="action" value="review" class="btn btn-success px-4">
+      Review Profile <i class="bi bi-eye ms-1"></i>
+    </button>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const DOC_TYPES = ["Aadhar Card","PAN Card","Passport","Driving Licence","Voter ID",
+  "10th Certificate","12th Certificate","Degree Certificate","Experience Letter","Relieving Letter"];
+
+function addDocRow() {
+  const c = document.getElementById('doc-container');
+  const opts = DOC_TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
+  const row = document.createElement('div');
+  row.className = 'row g-3 mb-3 doc-row align-items-end border rounded p-3 bg-light';
+  row.innerHTML = `
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Document Type</label>
+      <select name="doc_type" class="form-select"><option value="">-- Select --</option>${opts}</select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-semibold">Document Number</label>
+      <input type="text" name="doc_number" class="form-control" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">File</label>
+      <input type="file" name="doc_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" />
+    </div>
+    <div class="col-md-1 d-flex align-items-end">
+      <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="removeDocRow(this)"><i class="bi bi-trash"></i></button>
+    </div>
+  `;
+  c.appendChild(row);
+}
+function removeDocRow(btn) {
+  const rows = document.querySelectorAll('.doc-row');
+  if (rows.length > 1) btn.closest('.doc-row').remove();
+}
+</script>
+{% endblock %}

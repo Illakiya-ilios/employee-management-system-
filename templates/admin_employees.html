@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}All Employees{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-people me-2"></i>All Employees</h1>
+  <div class="user-badge">
+    <i class="bi bi-person-circle"></i> {{ current_user.username }}
+    <span class="role-badge role-SUPERADMIN">Admin</span>
+  </div>
+</div>
+
+<!-- Search & Filter -->
+<div class="card-form mb-4">
+  <form method="GET" class="row g-3 align-items-end">
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">Search</label>
+      <input type="text" name="q" class="form-control" placeholder="Name or employee code..." value="{{ query }}" />
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-semibold">Department</label>
+      <select name="dept" class="form-select">
+        <option value="">All Departments</option>
+        {% for d in departments %}
+        <option value="{{ d }}" {{ 'selected' if dept == d }}>{{ d }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label fw-semibold">Status</label>
+      <select name="status" class="form-select">
+        <option value="">All</option>
+        <option value="ACTIVE" {{ 'selected' if status == 'ACTIVE' }}>Active</option>
+        <option value="INACTIVE" {{ 'selected' if status == 'INACTIVE' }}>Inactive</option>
+      </select>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-fill"><i class="bi bi-search me-1"></i>Search</button>
+      <a href="{{ url_for('admin_employees') }}" class="btn btn-outline-secondary"><i class="bi bi-x"></i></a>
+    </div>
+  </form>
+</div>
+
+<div class="card-form">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="section-title mb-0">{{ employees | length }} Employee(s) Found</h5>
+  </div>
+  {% if employees %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Emp. Code</th>
+          <th>Name</th>
+          <th>Designation</th>
+          <th>Department</th>
+          <th>Joining Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in employees %}
+        <tr>
+          <td><span class="badge bg-secondary">{{ emp.employee_code }}</span></td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              {% if emp.photo_path %}
+              <img src="/uploads/{{ emp.photo_path }}" class="rounded-circle" style="width:32px;height:32px;object-fit:cover;" />
+              {% else %}
+              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center text-muted fw-bold"
+                style="width:32px;height:32px;font-size:.8rem;">
+                {{ emp.first_name[0] if emp.first_name else '?' }}
+              </div>
+              {% endif %}
+              <div>
+                <div class="fw-semibold">{{ emp.first_name }} {{ emp.last_name }}</div>
+                <div class="text-muted small">{{ emp.user.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="small">{{ emp.designation or '—' }}</td>
+          <td class="small">{{ emp.department or '—' }}</td>
+          <td class="small">{{ emp.joining_date or '—' }}</td>
+          <td>
+            <span class="badge {{ 'bg-success' if emp.employee_status == 'ACTIVE' else 'bg-secondary' }}">
+              {{ emp.employee_status }}
+            </span>
+          </td>
+          <td>
+            <a href="{{ url_for('admin_view_employee', employee_id=emp.employee_id) }}" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-eye"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-people fs-1 d-block mb-2"></i>
+    No employees found.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

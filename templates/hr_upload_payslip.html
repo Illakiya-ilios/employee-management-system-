@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Upload Payslip — {{ employee.first_name }} {{ employee.last_name }}{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-upload me-2"></i>Upload Payslip</h1>
+  <a href="{{ url_for('hr_payslips') }}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-md-5">
+    <div class="card-form">
+      <h5 class="section-title">Employee</h5>
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold"
+          style="width:50px;height:50px;font-size:1.2rem;">
+          {{ employee.first_name[0] }}{{ employee.last_name[0] if employee.last_name else '' }}
+        </div>
+        <div>
+          <div class="fw-bold">{{ employee.first_name }} {{ employee.last_name }}</div>
+          <div class="text-muted small">{{ employee.employee_code }} · {{ employee.designation or '—' }}</div>
+        </div>
+      </div>
+
+      <h5 class="section-title mt-4">Upload New Payslip</h5>
+      <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Month <span class="text-danger">*</span></label>
+          <select name="month" class="form-select" required>
+            <option value="">-- Select Month --</option>
+            {% for num, name in months %}
+            <option value="{{ num }}">{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Year <span class="text-danger">*</span></label>
+          <select name="year" class="form-select" required>
+            <option value="">-- Select Year --</option>
+            {% for yr in years | reverse %}
+            <option value="{{ yr }}">{{ yr }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-semibold">Payslip File <span class="text-danger">*</span></label>
+          <input type="file" name="payslip_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required />
+          <div class="form-text">PDF, JPG, PNG accepted. If a payslip for the same month/year exists, it will be replaced.</div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 fw-semibold py-2">
+          <i class="bi bi-upload me-2"></i>Upload Payslip
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-7">
+    <div class="card-form">
+      <h5 class="section-title">All Uploaded Payslips</h5>
+      {% set month_names = ["","January","February","March","April","May","June","July","August","September","October","November","December"] %}
+      {% if all_payslips %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>Period</th><th>Uploaded</th><th>Actions</th></tr></thead>
+          <tbody>
+            {% for ps in all_payslips %}
+            <tr>
+              <td class="fw-semibold">{{ month_names[ps.month] }} {{ ps.year }}</td>
+              <td class="small text-muted">{{ ps.uploaded_at.strftime('%d %b %Y, %H:%M') }}</td>
+              <td>
+                <form method="POST" action="{{ url_for('hr_delete_payslip', payslip_id=ps.payslip_id) }}" class="d-inline"
+                  onsubmit="return confirm('Delete this payslip?')">
+                  <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-4 text-muted">
+        <i class="bi bi-file-earmark-x fs-1 d-block mb-2"></i>
+        No payslips uploaded yet.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

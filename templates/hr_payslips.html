@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Payslip Management{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-file-earmark-text me-2"></i>Payslip Management</h1>
+  <div class="user-badge">
+    <i class="bi bi-person-badge"></i> {{ current_user.username }}
+    <span class="role-badge role-HR">HR</span>
+  </div>
+</div>
+
+<div class="card-form">
+  <h5 class="section-title">Active Employees</h5>
+  {% if employees %}
+  <div class="table-responsive">
+    <table class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Emp. Code</th>
+          <th>Name</th>
+          <th>Designation</th>
+          <th>Department</th>
+          <th>Payslips</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in employees %}
+        <tr>
+          <td><span class="badge bg-secondary">{{ emp.employee_code }}</span></td>
+          <td class="fw-semibold">{{ emp.first_name }} {{ emp.last_name }}</td>
+          <td class="small">{{ emp.designation or '—' }}</td>
+          <td class="small">{{ emp.department or '—' }}</td>
+          <td>
+            <span class="badge bg-light text-dark border">
+              {{ emp.payslips | length }} uploaded
+            </span>
+          </td>
+          <td>
+            <a href="{{ url_for('hr_upload_payslip', employee_id=emp.employee_id) }}" class="btn btn-sm btn-primary">
+              <i class="bi bi-upload me-1"></i>Manage Payslips
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="text-center py-5 text-muted">
+    <i class="bi bi-people fs-1 d-block mb-2"></i>
+    No active employees yet.
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

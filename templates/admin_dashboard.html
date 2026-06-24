@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Super Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-shield-lock me-2"></i>Super Admin Dashboard</h1>
+  <div class="user-badge">
+    <i class="bi bi-person-circle"></i> {{ current_user.username }}
+    <span class="role-badge role-SUPERADMIN">Admin</span>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="icon-wrap bg-primary bg-opacity-10"><i class="bi bi-people text-primary"></i></div>
+      <div>
+        <div class="stat-value">{{ total_employees }}</div>
+        <div class="stat-label">Total Employees</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="icon-wrap bg-purple bg-opacity-10" style="background:#ede9fe;"><i class="bi bi-person-badge" style="color:#7c3aed;"></i></div>
+      <div>
+        <div class="stat-value">{{ total_hr }}</div>
+        <div class="stat-label">HR Accounts</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="icon-wrap bg-warning bg-opacity-10"><i class="bi bi-hourglass text-warning"></i></div>
+      <div>
+        <div class="stat-value">{{ pending_hr }}</div>
+        <div class="stat-label">Pending HR Approvals</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-sm-6">
+    <div class="stat-card">
+      <div class="icon-wrap bg-info bg-opacity-10"><i class="bi bi-clipboard-check text-info"></i></div>
+      <div>
+        <div class="stat-value">{{ pending_profiles }}</div>
+        <div class="stat-label">Profiles Awaiting HR</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Quick Actions -->
+  <div class="col-md-4">
+    <div class="card-form">
+      <h5 class="section-title">Quick Actions</h5>
+      <div class="d-grid gap-2">
+        <a href="{{ url_for('admin_employees') }}" class="btn btn-outline-primary">
+          <i class="bi bi-people me-2"></i>View All Employees
+        </a>
+        <a href="{{ url_for('admin_hr_list') }}" class="btn btn-outline-secondary">
+          <i class="bi bi-person-badge me-2"></i>Manage HR Accounts
+        </a>
+        <a href="{{ url_for('admin_create_hr') }}" class="btn btn-outline-success">
+          <i class="bi bi-person-plus me-2"></i>Create HR Account
+        </a>
+        <a href="{{ url_for('admin_logs') }}" class="btn btn-outline-dark">
+          <i class="bi bi-journal-text me-2"></i>View Audit Logs
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity -->
+  <div class="col-md-8">
+    <div class="card-form">
+      <h5 class="section-title">Recent Activity</h5>
+      {% if recent_logs %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead><tr><th>User</th><th>Action</th><th>Target</th><th>Time</th></tr></thead>
+          <tbody>
+            {% for log in recent_logs %}
+            <tr>
+              <td class="small fw-semibold">{{ log.user.username if log.user else '—' }}</td>
+              <td><span class="badge bg-light text-dark border small">{{ log.action }}</span></td>
+              <td class="small text-muted">{{ log.target_table or '—' }} #{{ log.target_id or '' }}</td>
+              <td class="small text-muted">{{ log.created_at.strftime('%d %b, %H:%M') }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted small">No activity yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

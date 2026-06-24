@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Complete Your Profile — Step {{ step }} of {{ total_steps }}{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-person-lines-fill me-2"></i>Complete Your Profile</h1>
+  <div class="user-badge">
+    <i class="bi bi-person-circle"></i>
+    {{ current_user.username }}
+    <span class="role-badge role-EMPLOYEE">Employee</span>
+  </div>
+</div>
+
+<!-- Step indicator -->
+<div class="step-indicator">
+  {% set step_names = ["Personal Info", "Address", "Emergency Contacts", "Employment", "Bank & PF", "Documents"] %}
+  {% for i in range(1, total_steps + 1) %}
+    {% set done_flag = [profile.step1_done, profile.step2_done, profile.step3_done, profile.step4_done, profile.step5_done, profile.step6_done][i-1] %}
+    <div class="step-item {{ 'active' if i == step else 'done' if done_flag else '' }}">
+      <span class="step-num">
+        {% if done_flag and i != step %}<i class="bi bi-check" style="font-size:.7rem;"></i>{% else %}{{ i }}{% endif %}
+      </span>
+      {{ step_names[i-1] }}
+    </div>
+    {% if i < total_steps %}
+      <div class="d-flex align-items-center text-muted" style="font-size:.7rem;"><i class="bi bi-chevron-right"></i></div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<div class="card-form">
+  {% block step_content %}{% endblock %}
+</div>
+{% endblock %}

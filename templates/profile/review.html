@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Review & Submit Profile{% endblock %}
+
+{% block content %}
+<div class="topbar">
+  <h1><i class="bi bi-clipboard-check me-2"></i>Review & Submit Your Profile</h1>
+  <div class="user-badge">
+    <i class="bi bi-person-circle"></i> {{ current_user.username }}
+    <span class="role-badge role-EMPLOYEE">Employee</span>
+  </div>
+</div>
+
+{% if profile.status == "REJECTED" %}
+<div class="alert alert-danger d-flex gap-3 align-items-start">
+  <i class="bi bi-x-circle fs-4"></i>
+  <div>
+    <strong>Profile Rejected</strong><br/>
+    HR Remarks: {{ profile.hr_remarks or 'No remarks provided.' }}<br/>
+    <a href="{{ url_for('profile_step', step=1) }}" class="btn btn-sm btn-outline-danger mt-2">Edit & Resubmit</a>
+  </div>
+</div>
+{% elif profile.status == "PENDING" %}
+<div class="alert alert-warning d-flex gap-2 align-items-center">
+  <i class="bi bi-hourglass-split"></i>
+  Your profile is currently under HR review. You cannot make changes while it is pending.
+</div>
+{% elif profile.status == "APPROVED" %}
+<div class="alert alert-success d-flex gap-2 align-items-center">
+  <i class="bi bi-check-circle"></i>
+  Your profile has been approved! You can view it from your dashboard.
+</div>
+{% endif %}
+
+<div class="row g-4">
+  <!-- Personal Info -->
+  <div class="col-12">
+    <div class="card-form">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0"><i class="bi bi-person me-2"></i>Personal Information</h5>
+        {% if profile.status not in ('PENDING','APPROVED') %}
+        <a href="{{ url_for('profile_step', step=1) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        {% endif %}
+      </div>
+      <div class="row g-2">
+        {% macro rv(label, val) %}
+          <div class="col-md-3 col-sm-6">
+            <div class="text-muted" style="font-size:.75rem;">{{ label }}</div>
+            <div class="fw-semibold small">{{ val or '—' }}</div>
+          </div>
+        {% endmacro %}
+        {{ rv("Full Name", (profile.first_name or '') + ' ' + (profile.middle_name or '') + ' ' + (profile.last_name or '')) }}
+        {{ rv("Date of Birth", profile.date_of_birth) }}
+        {{ rv("Gender", profile.gender) }}
+        {{ rv("Blood Group", profile.blood_group) }}
+        {{ rv("Nationality", profile.nationality) }}
+        {{ rv("Religion", profile.religion) }}
+        {{ rv("Marital Status", profile.marital_status) }}
+        {{ rv("Mobile", profile.mobile_number) }}
+        {{ rv("Personal Email", profile.personal_email) }}
+        {{ rv("Mother Tongue", profile.mother_tongue) }}
+      </div>
+    </div>
+  </div>
+
+  <!-- Address -->
+  <div class="col-md-6">
+    <div class="card-form h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0"><i class="bi bi-geo-alt me-2"></i>Address</h5>
+        {% if profile.status not in ('PENDING','APPROVED') %}
+        <a href="{{ url_for('profile_step', step=2) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        {% endif %}
+      </div>
+      <p class="small mb-1 fw-semibold text-muted">Permanent</p>
+      <p class="small">{{ profile.perm_address_line1 or '—' }}, {{ profile.perm_city or '' }}, {{ profile.perm_state or '' }} {{ profile.perm_postal_code or '' }}, {{ profile.perm_country or '' }}</p>
+      <p class="small mb-1 fw-semibold text-muted mt-2">Current</p>
+      <p class="small">{{ profile.curr_address_line1 or '—' }}, {{ profile.curr_city or '' }}</p>
+    </div>
+  </div>
+
+  <!-- Emergency Contacts -->
+  <div class="col-md-6">
+    <div class="card-form h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0"><i class="bi bi-telephone me-2"></i>Emergency Contacts</h5>
+        {% if profile.status not in ('PENDING','APPROVED') %}
+        <a href="{{ url_for('profile_step', step=3) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        {% endif %}
+      </div>
+      {% if emergency_contacts %}
+        {% for ec in emergency_contacts %}
+        <div class="d-flex gap-3 mb-2">
+          <i class="bi bi-person-heart text-primary mt-1"></i>
+          <div>
+            <div class="fw-semibold small">{{ ec.name }}</div>
+            <div class="text-muted small">{{ ec.relationship }} · {{ ec.phone }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted small">No contacts added.</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Employment -->
+  <div class="col-12">
+    <div class="card-form">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0"><i class="bi bi-briefcase me-2"></i>Employment</h5>
+        {% if profile.status not in ('PENDING','APPROVED') %}
+        <a href="{{ url_for('profile_step', step=4) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        {% endif %}
+      </div>
+      <div class="row g-2 mb-3">
+        <div class="col-md-3"><div class="text-muted small">Designation</div><div class="fw-semibold small">{{ profile.designation or '—' }}</div></div>
+        <div class="col-md-3"><div class="text-muted small">Department</div><div class="fw-semibold small">{{ profile.department or '—' }}</div></div>
+        <div class="col-md-3"><div class="text-muted small">Joining Date</div><div class="fw-semibold small">{{ profile.joining_date or '—' }}</div></div>
+      </div>
+      {% if employment_history %}
+      <table class="table table-sm table-bordered small">
+        <thead class="table-light"><tr><th>Employer</th><th>Position</th><th>From</th><th>To</th></tr></thead>
+        <tbody>
+          {% for h in employment_history %}
+          <tr><td>{{ h.employer }}</td><td>{{ h.position }}</td><td>{{ h.from }}</td><td>{{ h.to }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Bank & PF -->
+  <div class="col-md-6">
+    <div class="card-form">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0"><i class="bi bi-bank me-2"></i>Bank & PF</h5>
+        {% if profile.status not in ('PENDING','APPROVED') %}
+        <a href="{{ url_for('profile_step', step=5) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        {% endif %}
+      </div>
+      <div class="row g-2">
+        <div class="col-6"><div class="text-muted small">Bank</div><div class="fw-semibold small">{{ profile.bank_name or '—' }}</div></div>
+        <div class="col-6"><div class="text-muted small">Account No.</div><div class="fw-semibold small">{{ profile.account_number or '—' }}</div></div>
+        <div class="col-6"><div class="text-muted small">IFSC</div><div class="fw-semibold small">{{ profile.ifsc_code or '—' }}</div></div>
+        <div class="col-6"><div class="text-muted small">PF Number</div><div class="fw-semibold small">{{ profile.pf_number or '—' }}</div></div>
+        <div class="col-6"><div class="text-muted small">UAN</div><div class="fw-semibold small">{{ profile.uan_number or '—' }}</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Documents -->
+  <div class="col-md-6">
+    <div class="card-form">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="section-title mb-0"><i class="bi bi-file-earmark-check me-2"></i>Documents</h5>
+        {% if profile.status not in ('PENDING','APPROVED') %}
+        <a href="{{ url_for('profile_step', step=6) }}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil me-1"></i>Edit</a>
+        {% endif %}
+      </div>
+      {% if documents %}
+        {% for doc in documents %}
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="bi bi-file-earmark-pdf text-danger"></i>
+          <div>
+            <div class="fw-semibold small">{{ doc.type }}</div>
+            <div class="text-muted small">{{ doc.number or 'No number' }} · {{ '✓ File uploaded' if doc.file_path else '✗ No file' }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted small">No documents added.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Submit -->
+{% if profile.status in ("DRAFT", "REJECTED", None) %}
+<div class="mt-4 card-form d-flex justify-content-between align-items-center">
+  <div>
+    <p class="mb-0 fw-semibold">Ready to submit for HR review?</p>
+    <p class="text-muted small mb-0">Once submitted, you cannot edit until HR reviews your profile.</p>
+  </div>
+  <form method="POST">
+    <button type="submit" class="btn btn-success px-5 py-2 fw-semibold">
+      <i class="bi bi-send me-2"></i>Submit for Approval
+    </button>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

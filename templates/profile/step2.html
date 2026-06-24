@@ -1,0 +1,91 @@
+{% extends "profile/step_base.html" %}
+{% block step_content %}
+<h5 class="section-title"><i class="bi bi-geo-alt me-2"></i>Address Details</h5>
+
+<form method="POST">
+  <h6 class="text-muted fw-semibold mb-3">Permanent Address</h6>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Address Line 1</label>
+      <input type="text" name="perm_address_line1" class="form-control" value="{{ profile.perm_address_line1 or '' }}" />
+    </div>
+    <div class="col-md-6">
+      <label class="form-label fw-semibold">Address Line 2</label>
+      <input type="text" name="perm_address_line2" class="form-control" value="{{ profile.perm_address_line2 or '' }}" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">City</label>
+      <input type="text" name="perm_city" class="form-control" value="{{ profile.perm_city or '' }}" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-semibold">State / Province</label>
+      <input type="text" name="perm_state" class="form-control" value="{{ profile.perm_state or '' }}" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label fw-semibold">Postal Code</label>
+      <input type="text" name="perm_postal_code" class="form-control" value="{{ profile.perm_postal_code or '' }}" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label fw-semibold">Country</label>
+      <input type="text" name="perm_country" class="form-control" value="{{ profile.perm_country or '' }}" />
+    </div>
+  </div>
+
+  <hr class="my-4" />
+
+  <div class="d-flex align-items-center gap-2 mb-3">
+    <h6 class="text-muted fw-semibold mb-0">Current Address</h6>
+    <div class="form-check mb-0 ms-3">
+      <input class="form-check-input" type="checkbox" name="curr_same_as_perm" id="sameCheck"
+        {{ 'checked' if profile.curr_same_as_perm }} onchange="toggleCurrent(this)" />
+      <label class="form-check-label" for="sameCheck">Same as permanent address</label>
+    </div>
+  </div>
+
+  <div id="curr-addr" class="{{ 'd-none' if profile.curr_same_as_perm }}">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Address Line 1</label>
+        <input type="text" name="curr_address_line1" class="form-control" value="{{ profile.curr_address_line1 or '' }}" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label fw-semibold">Address Line 2</label>
+        <input type="text" name="curr_address_line2" class="form-control" value="{{ profile.curr_address_line2 or '' }}" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">City</label>
+        <input type="text" name="curr_city" class="form-control" value="{{ profile.curr_city or '' }}" />
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">State / Province</label>
+        <input type="text" name="curr_state" class="form-control" value="{{ profile.curr_state or '' }}" />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label fw-semibold">Postal Code</label>
+        <input type="text" name="curr_postal_code" class="form-control" value="{{ profile.curr_postal_code or '' }}" />
+      </div>
+      <div class="col-md-2">
+        <label class="form-label fw-semibold">Country</label>
+        <input type="text" name="curr_country" class="form-control" value="{{ profile.curr_country or '' }}" />
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between mt-4">
+    <button type="submit" name="action" value="prev" class="btn btn-outline-secondary px-4">
+      <i class="bi bi-chevron-left me-1"></i> Back
+    </button>
+    <button type="submit" name="action" value="next" class="btn btn-primary px-4">
+      Next <i class="bi bi-chevron-right ms-1"></i>
+    </button>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleCurrent(cb) {
+  document.getElementById('curr-addr').classList.toggle('d-none', cb.checked);
+}
+</script>
+{% endblock %}
